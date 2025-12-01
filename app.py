@@ -46,23 +46,73 @@ st.markdown("---")
 # =====================================
 #            SIDEBAR FILTERS
 # =====================================
-st.sidebar.header("Filter the Data")
+st.sidebar.title("Filters & Dataset Info")
 
-region_filter = st.sidebar.multiselect("Select Regions", df["region"].unique(), default=df["region"].unique())
-job_filter = st.sidebar.multiselect("Select Job Titles", df["job_title"].unique(), default=df["job_title"].unique())
-size_filter = st.sidebar.multiselect("Company Size", df["company_size"].unique(), default=df["company_size"].unique())
+st.sidebar.markdown("""
+### 📘 Dataset Description  
+This dataset is collected from **Jadarat**, the official Saudi employment platform.  
+It includes job postings from governmental, private, and semi-government organizations.
+""")
 
+st.sidebar.markdown("---")
+
+salary_min, salary_max = st.sidebar.slider(
+    "Select Salary Range (SAR):",
+    int(df["salary"].min()),
+    int(df["salary"].max()),
+    (4000, 15000)
+)
+
+exp_min, exp_max = st.sidebar.slider(
+    "Select Experience Years:",
+    int(df["experience_years"].min()),
+    int(df["experience_years"].max()),
+    (0, 5)
+)
+
+selected_regions = st.sidebar.multiselect(
+    "Select Region(s):",
+    df["region"].unique(),
+    default=list(df["region"].unique())
+)
+
+selected_titles = st.sidebar.multiselect(
+    "Select Job Title(s):",
+    df["job_title"].unique(),
+    default=df["job_title"].unique()
+)
+
+selected_industries = st.sidebar.multiselect(
+    "Select Industry:",
+    df["economic_activity"].unique(),
+    default=df["economic_activity"].unique()
+)
+
+
+
+st.sidebar.markdown("---")
+st.sidebar.markdown("Filters applied to all visualizations.")
+
+# =====================================
+#                APPLY FILTERS
+# =====================================
 df_filtered = df[
-    (df["region"].isin(region_filter)) &
-    (df["job_title"].isin(job_filter)) &
-    (df["company_size"].isin(size_filter))
+    (df["salary"] >= salary_min) &
+    (df["salary"] <= salary_max) &
+    (df["experience_years"] >= exp_min) &
+    (df["experience_years"] <= exp_max) &
+    (df["region"].isin(selected_regions)) &
+    (df["job_title"].isin(selected_titles)) &
+    (df["economic_activity"].isin(selected_industries))
 ]
+
 
 # =====================================
 #                DATA PREVIEW
 # =====================================
 st.subheader("📁 Filtered Dataset Preview")
 st.dataframe(df_filtered.head())
+
 st.markdown("---")
 
 # =====================================
@@ -121,8 +171,6 @@ st.markdown("""
 """)
 
 st.markdown("---")
-
-
 
 # =====================================
 #          MONTHLY TREND
